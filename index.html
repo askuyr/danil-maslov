@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Я вертел Данила Маслова</title>
+<meta name="description" content="Шуточный сайт: крутящиеся фотографии и надпись «Я вертел Данила Маслова». Сделан ради смеха, не всерьёз.">
+<title>Я вертел Данила Маслова — шуточный сайт</title>
 <style>
   :root{
     --lime:#c8ff00;
@@ -109,6 +110,13 @@
     text-transform:uppercase;
     color:rgba(255,255,255,.55);
   }
+  .joke{
+    margin:0;
+    font-size: 12px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.32);
+  }
   @media (prefers-reduced-motion: reduce){
     .cube{ animation:none; transform: rotateX(-16deg) rotateY(-24deg); }
   }
@@ -120,6 +128,7 @@
   <h1>Я вертел <span><em>Данила</em> Маслова</span></h1>
   <div class="stage"><div class="cube" id="cube"></div></div>
   <p class="note">крутится и будет крутиться</p>
+  <p class="joke">шуточный сайт · сделан ради смеха, без обид</p>
 </main>
 
 <script>
