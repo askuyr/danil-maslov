@@ -12,15 +12,13 @@
     --size: clamp(180px, 34vmin, 300px);
   }
   *{ box-sizing:border-box; }
-  html,body{ height:100%; }
   body{
     margin:0;
     background:var(--ink);
     color:#fff;
     font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-    overflow:hidden;
-    display:grid;
-    place-items:center;
+    overflow-x:hidden;
+    overflow-y:auto;
   }
   /* свет и сетка на фоне */
   .bg{
@@ -33,7 +31,8 @@
   }
   main{
     position:relative;
-    display:flex; flex-direction:column; align-items:center;
+    min-height: 100svh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap: clamp(18px, 5vh, 56px);
     padding: 24px;
     text-align:center;
@@ -117,8 +116,62 @@
     text-transform:uppercase;
     color:rgba(255,255,255,.32);
   }
+
+  /* подсказка «листай вниз» */
+  .hint{
+    position:absolute; bottom:18px; left:50%; transform:translateX(-50%);
+    font-size:11px; letter-spacing:.3em; text-transform:uppercase;
+    color:rgba(255,255,255,.4);
+    animation: bob 2s ease-in-out infinite;
+  }
+  @keyframes bob{ 50%{ transform:translate(-50%, 6px); } }
+
+  /* второй экран: спиннер с фотографией */
+  .more{
+    position:relative;
+    min-height: 100svh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap: clamp(20px, 4vh, 40px);
+    padding: 40px 24px;
+    text-align:center;
+    border-top:1px solid rgba(200,255,0,.18);
+  }
+  .more h2{
+    margin:0;
+    font-size: clamp(22px, 4.4vw, 44px);
+    line-height:.95; letter-spacing:-.01em; text-transform:uppercase; font-weight:900;
+  }
+  .more h2 span{ color:var(--lime); }
+
+  .spinner{
+    --d: clamp(180px, 52vmin, 380px);
+    width:var(--d); height:var(--d);
+    border-radius:50%;
+    padding: 10px;
+    background: conic-gradient(var(--lime) 0 18%, rgba(200,255,0,.12) 18% 42%, var(--lime) 42% 60%, rgba(200,255,0,.12) 60% 100%);
+    -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 12px), #000 calc(100% - 11px));
+            mask: radial-gradient(closest-side, transparent calc(100% - 12px), #000 calc(100% - 11px));
+    animation: turn 1.6s linear infinite;
+    display:grid; place-items:center;
+  }
+  .disc{
+    width:100%; height:100%;
+    border-radius:50%;
+    overflow:hidden;
+    border:1px solid rgba(200,255,0,.35);
+    animation: turn 9s linear infinite reverse;
+  }
+  .disc img{ width:100%; height:100%; object-fit:cover; display:block; }
+  @keyframes turn{ to{ transform: rotate(360deg); } }
+
+  .load{
+    font-size: clamp(11px, 2.4vw, 13px);
+    letter-spacing:.35em; text-transform:uppercase;
+    color:rgba(255,255,255,.5);
+  }
   @media (prefers-reduced-motion: reduce){
     .cube{ animation:none; transform: rotateX(-16deg) rotateY(-24deg); }
+    .spinner, .disc, .hint{ animation:none; }
   }
 </style>
 </head>
@@ -129,7 +182,17 @@
   <div class="stage"><div class="cube" id="cube"></div></div>
   <p class="note">крутится и будет крутиться</p>
   <p class="joke">шуточный сайт · сделан ради смеха, без обид</p>
+  <div class="hint">листай вниз ↓</div>
 </main>
+
+<section class="more">
+  <h2>загружаем <span>маслова</span>…</h2>
+  <div class="spinner">
+    <div class="disc"><img src="danil_2.jpg" alt="Данила Маслов" loading="lazy"></div>
+  </div>
+  <p class="load" id="pct">0%</p>
+  <p class="joke">шуточный сайт · никогда не догрузится, и это шутка</p>
+</section>
 
 <script>
   // имя файла с фото — положи картинку рядом с этим html.
@@ -165,6 +228,14 @@
   }
   build();
   addEventListener('resize', build);
+
+  // счётчик ползёт вверх и навсегда застревает на 99% — так и задумано
+  const pct = document.getElementById('pct');
+  let p = 0;
+  setInterval(() => {
+    p = Math.min(99, p + Math.random() * 6);
+    pct.textContent = Math.floor(p) + '%';
+  }, 350);
 </script>
 </body>
 </html>
