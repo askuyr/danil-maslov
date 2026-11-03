@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Я вертел Данила Маслова</title>
+<style>
+  :root{
+    --lime:#c8ff00;
+    --ink:#07070a;
+    --size: clamp(180px, 34vmin, 300px);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    background:var(--ink);
+    color:#fff;
+    font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    overflow:hidden;
+    display:grid;
+    place-items:center;
+  }
+  /* свет и сетка на фоне */
+  .bg{
+    position:fixed; inset:-20%;
+    background:
+      radial-gradient(closest-side at 50% 45%, rgba(200,255,0,.16), transparent 70%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.045) 0 1px, transparent 1px 80px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 1px, transparent 1px 80px);
+    pointer-events:none;
+  }
+  main{
+    position:relative;
+    display:flex; flex-direction:column; align-items:center;
+    gap: clamp(18px, 5vh, 56px);
+    padding: 24px;
+    text-align:center;
+  }
+  h1{
+    margin:0;
+    font-size: clamp(30px, 7.4vw, 84px);
+    line-height:.88;
+    letter-spacing:-.02em;
+    text-transform:uppercase;
+    font-weight:900;
+  }
+  h1 span{
+    display:block;
+    color:var(--lime);
+    text-shadow: 0 0 40px rgba(200,255,0,.35);
+  }
+  h1 em{
+    font-style:normal;
+    -webkit-text-stroke:2px var(--lime);
+    color:transparent;
+  }
+
+  /* сцена */
+  .stage{
+    width:var(--size); height:var(--size);
+    perspective: 1100px;
+    position:relative;
+    margin-bottom: calc(var(--size) * .3);
+  }
+  .stage::after{ /* отражение под кубом */
+    content:"";
+    position:absolute; left:50%; bottom:-16px;
+    width:70%; height:26px; transform:translateX(-50%);
+    background: radial-gradient(closest-side, rgba(200,255,0,.35), transparent);
+    filter: blur(6px);
+  }
+  .cube{
+    position:absolute; inset:0;
+    transform-style:preserve-3d;
+    animation: spin 14s linear infinite;
+  }
+  @keyframes spin{
+    from{ transform: rotateX(-16deg) rotateY(0deg); }
+    to  { transform: rotateX(-16deg) rotateY(360deg); }
+  }
+  .face{
+    position:absolute; inset:0;
+    border:1px solid rgba(200,255,0,.5);
+    border-radius:10px;
+    overflow:hidden;
+    background: linear-gradient(145deg, #1a1a20, #0d0d11 60%, #22220a);
+    display:grid; place-items:center;
+    box-shadow: 0 0 30px rgba(0,0,0,.6) inset;
+  }
+  .face b{ /* заглушка, если фото нет */
+    font-size: clamp(28px, 9vmin, 74px);
+    letter-spacing:.08em;
+    color:var(--lime);
+    opacity:.75;
+  }
+  .face img{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .face img:not([src]), .face img[src=""]{ display:none; }
+
+  .note{
+    margin:0;
+    font-size: clamp(11px, 2.6vw, 14px);
+    letter-spacing:.35em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.55);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .cube{ animation:none; transform: rotateX(-16deg) rotateY(-24deg); }
+  }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<main>
+  <h1>Я вертел <span><em>Данила</em> Маслова</span></h1>
+  <div class="stage"><div class="cube" id="cube"></div></div>
+  <p class="note">крутится и будет крутиться</p>
+</main>
+
+<script>
+  // имя файла с фото — положи картинку рядом с этим html.
+  // хочешь разные фото на гранях — перечисли несколько файлов.
+  const photos = ['danil_maslov.jpg'];
+  const size = getComputedStyle(document.documentElement).getPropertyValue('--size').trim() || '240px';
+  const cube = document.getElementById('cube');
+
+  const faces = [
+    ['translateZ(HALFpx)', 0], ['rotateY(90deg) translateZ(HALFpx)', 1],
+    ['rotateY(180deg) translateZ(HALFpx)', 2], ['rotateY(-90deg) translateZ(HALFpx)', 3],
+    ['rotateX(90deg) translateZ(HALFpx)', 4], ['rotateX(-90deg) translateZ(HALFpx)', 5]
+  ];
+
+  function build() {
+    const w = document.querySelector('.stage').clientWidth || 240;
+    cube.innerHTML = '';
+    faces.forEach(([tpl, i]) => {
+      const f = document.createElement('div');
+      f.className = 'face';
+      f.style.transform = tpl.replace('HALF', w / 2);
+      const mark = document.createElement('b');
+      mark.textContent = 'ДМ';           // заглушка, пока нет фото
+      f.appendChild(mark);
+      const img = new Image();
+      img.alt = '';
+      img.onload = () => mark.remove();
+      img.onerror = () => img.remove();
+      img.src = photos[i % photos.length];
+      f.appendChild(img);
+      cube.appendChild(f);
+    });
+  }
+  build();
+  addEventListener('resize', build);
+</script>
+</body>
+</html>
